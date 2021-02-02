@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Payment Pointers</title>
+    <link rel="stylesheet" href="common.css" />
+
+    <!-- Payment pointer is from https://contractfortheweb.org/ -->
+    <link rel="monetization" href="https://ilp.uphold.com/rKe8mMbUGkBm" />
+  </head>
+
+  <body>
+    <output>
+      <p>
+        This page has made
+        <span id="total">nothing (yet)</span>
+        <span id="currency"></span>
+      </p>
+    </output>
+
+    <script>
+      if (navigator.monetization) {
+        let total = 0;
+        let scale;
+        navigator.monetization.addEventListener("progress", ev => {
+          if (total === 0) {
+            scale = ev.assetScale;
+            document.getElementById("currency").textContent = ev.assetCode;
+          }
+
+          total += Number(ev.amount);
+
+          const formatted = (total * Math.pow(10, -scale)).toFixed(scale);
+          document.getElementById("total").textContent = formatted;
+        });
+      }
+    </script>
+  </body>
+</html>

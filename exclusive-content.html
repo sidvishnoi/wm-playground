@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exclusive Content</title>
+
+    <!-- Payment pointer is from https://contractfortheweb.org/ -->
+    <link rel="monetization" href="https://ilp.uphold.com/rKe8mMbUGkBm" />
+
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p>Content will appear below here if you are Web monetized.</p>
+    <hr />
+    <div id="exclusive" class="hidden">Here's some exclusive content!</div>
+
+    <script>
+      if (navigator.monetization) {
+        const onPayment = () => {
+          document.getElementById("exclusive").hidden = false;
+        };
+        navigator.monetization.addEventListener("progress", onPayment, {
+          once: true,
+        });
+      }
+    </script>
+  </body>
+</html>

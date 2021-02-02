@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebMonetization Test</title>
+    <link rel="stylesheet" href="common.css" />
+  </head>
+  <body>
+    <form>
+      <label for="pp">Payment Pointer</label>
+      <input type="text" id="pp" list="pp-list" />
+      <datalist id="pp-list">
+        <option value="$ilp.uphold.com/rKe8mMbUGkBm">
+          contractfortheweb.org
+        </option>
+        <option
+          value="https://webmonetization.org/api/receipts/%24ilp.uphold.com%2FBmXpharJp7Hk"
+        >
+          Sid Vishnoi +Receipt
+        </option>
+      </datalist>
+      <button>Submit</button>
+
+      <details>
+        <ul>
+          <li>
+            Submit a payment pointer/URL to start payment. Results will appear
+            below with a few seconds delay.
+          </li>
+          <li>Submit empty form to stop monetization.</li>
+        </ul>
+      </details>
+    </form>
+
+    <output>
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Amount</th>
+            <th>Receipt</th>
+            <th>URL</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </output>
+
+    <script type="module">
+      import { $, now, setMonetizationTag } from "./common.js";
+
+      $("form").addEventListener("submit", ev => {
+        ev.preventDefault();
+        if (ev.submitter.localName !== "button") return;
+        const input = $("form input");
+        const href = input.value;
+
+        input.value = "";
+        ev.submitter.disabled = true;
+        input.disabled = true;
+
+        setMonetizationTag(href);
+
+        setTimeout(() => {
+          input.disabled = false;
+          ev.submitter.disabled = false;
+        }, 3000);
+      });
+
+      navigator.monetization.addEventListener("progress", ev => {
+        console.log(ev);
+        const html = String.raw; // just to enable syntax highlighting
+        const amount = {
+          value: ev.amount,
+          assetScale: ev.assetScale,
+          assetCode: ev.assetCode,
+        };
+        const row = document.createElement("tr");
+        row.innerHTML = html`
+          <td>${now()}</td>
+          <td>${JSON.stringify(amount)}</td>
+          <td>${ev.receipt}</td>
+          <td>${ev.url}</td>
+        `;
+        $("output table tbody").prepend(row);
+      });
+    </script>
+  </body>
+</html>

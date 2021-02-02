@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Payment Pointers</title>
+    <link rel="stylesheet" href="common.css" />
+  </head>
+  <body>
+    <form>
+      <table>
+        <tr>
+          <td><label for="pp">Payment Pointer</label></td>
+          <td><input type="text" id="pp" /></td>
+        </tr>
+        <tr>
+          <td><label for="csp">monetization-src CSP</label></td>
+          <td>
+            <input type="text" id="csp" list="csp-options" />
+            <datalist id="csp-options">
+              <option value="">No CSP</option>
+              <option value="'none'">Disallow all</option>
+              <option value="https://ilp.uphold.com/*">
+                Disallow ilp.uphold.com
+              </option>
+            </datalist>
+          </td>
+        </tr>
+        <tr>
+          <td><button>Submit</button></td>
+          <td>To update CSP, refresh the page then Submit.</td>
+        </tr>
+      </table>
+    </form>
+
+    <output>
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Amount</th>
+            <th>Receipt</th>
+            <th>URL</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </output>
+
+    <script type="module">
+      import { $, now, setMonetizationTag } from "./common.js";
+
+      const setCSP = csp => {
+        const toMonetizationCSP = val => `monetization-src ${val};`;
+
+        const createCSPMetaElement = cspValue => {
+          const meta = document.createElement("meta");
+          meta.setAttribute("http-equiv", "Content-Security-Policy");
+          meta.setAttribute("content", toMonetizationCSP(cspValue));
+          return meta;
+        };
+
+        const head = document.head;
+        const el = $("meta[http-equiv=Content-Security-Policy]", head);
+        if (csp && el) {
+          el.content = toMonetizationCSP(csp);
+        } else if (csp) {
+          head.prepend(createCSPMetaElement(csp));
+        } else if (el) {
+          el.remove();
+          return true;
+        }
+      };
+
+      $("form").addEventListener("submit", ev => {
+        ev.preventDefault();
+        if (ev.submitter.localName !== "button") return;
+
+        const $pp = $("form input#pp");
+        const href = $pp.value;
+
+        const $csp = $("form input#csp");
+        const csp = $csp.value;
+
+        ev.submitter.disabled = true;
+        $pp.disabled = true;
+        $csp.disabled = true;
+
+        const removedCSP = setCSP(csp);
+        if (removedCSP) $("link[rel=monetization]")?.remove();
+        setMonetizationTag(href);
+
+        setTimeout(() => {
+          $pp.disabled = false;
+          $csp.disabled = false;
+          ev.submitter.disabled = false;
+        }, 3000);
+      });
+
+      window.addEventListener("error", console.info);
+
+      navigator.monetization.addEventListener("progress", ev => {
+        console.log(ev);
+        const html = String.raw; // just to enable syntax highlighting
+        const amount = {
+          value: ev.amount,
+          assetScale: ev.assetScale,
+          assetCode: ev.assetCode,
+        };
+        const row = document.createElement("tr");
+        row.innerHTML = html`
+          <td>${now()}</td>
+          <td>${JSON.stringify(amount)}</td>
+          <td>${ev.receipt}</td>
+          <td>${ev.url}</td>
+        `;
+        $("output table tbody").prepend(row);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+body {
+  font-family: monospace;
+}
+form {
+  background: #005a9c;
+  padding: 0.5em;
+  color: #fff;
+}
+form input,
+form button {
+  font: inherit;
+}
+form input {
+  min-width: min(70vw, 50ch);
+}
+form :disabled {
+  cursor: not-allowed;
+}
+
+output table {
+  width: 100%;
+}
+output table tr {
+  background: #eee;
+}
+output table tr:nth-child(2n) {
+  background: #fafafa;
+}
+output table td,
+output table th {
+  padding: 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+output table th {
+  position: sticky;
+  top: 0;
+  background: #f0f8ff;
+}
