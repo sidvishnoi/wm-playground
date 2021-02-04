@@ -20,10 +20,10 @@
     </output>
 
     <script>
-      if (navigator.monetization) {
+      if (window.monetization) {
         let total = 0;
         let scale;
-        navigator.monetization.addEventListener("progress", ev => {
+        window.monetization.addEventListener("progress", ev => {
           if (total === 0) {
             scale = ev.assetScale;
             document.getElementById("currency").textContent = ev.assetCode;

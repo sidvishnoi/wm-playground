@@ -102,7 +102,7 @@
 
       window.addEventListener("error", console.info);
 
-      navigator.monetization.addEventListener("progress", ev => {
+      window.monetization.addEventListener("progress", ev => {
         console.log(ev);
         const html = String.raw; // just to enable syntax highlighting
         const amount = {

@@ -21,11 +21,11 @@
     <div id="exclusive" class="hidden">Here's some exclusive content!</div>
 
     <script>
-      if (navigator.monetization) {
+      if (window.monetization) {
         const onPayment = () => {
           document.getElementById("exclusive").hidden = false;
         };
-        navigator.monetization.addEventListener("progress", onPayment, {
+        window.monetization.addEventListener("progress", onPayment, {
           once: true,
         });
       }
